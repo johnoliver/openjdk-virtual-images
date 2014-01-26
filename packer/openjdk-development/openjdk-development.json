@@ -1,14 +1,18 @@
 {
   "provisioners": [
     {
+      "type": "puppet-masterless",
+      "manifest_file": "puppet/manifests/site.pp",
+      "module_paths":  ["puppet/modules"],
+      "facter" : {
+        "fqdn" : "packer-virtualbox-iso"
+      },
+      "execute_command": "echo 'vagrant' | sudo -S -E puppet apply --verbose --modulepath='{{.ModulePath}}' {{.ManifestFile}}"
+    },
+    {
       "type": "shell",
       "scripts": [
         "scripts/build_time.sh",
-        "scripts/apt.sh",
-        "scripts/sudo.sh",
-        "scripts/vagrant.sh",
-        "scripts/ruby.sh",
-        "scripts/chef.sh",
         "scripts/vbox.sh",
         "scripts/cleanup.sh"
       ],
@@ -47,18 +51,8 @@
       "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "virtualbox_version_file": ".vbox_version",
       "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "512"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "1"
-        ]
+        [ "modifyvm", "{{.Name}}", "--memory", "512" ],
+        [ "modifyvm", "{{.Name}}", "--cpus",   "1"   ]
       ]
     }
   ],
